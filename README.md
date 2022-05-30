@@ -1,6 +1,12 @@
 # AsktoKnowMore
 This repository contains code and models for the paper: "Ask to Know More: Counterfactual Explanations for Fake Claims"
 
+* We integrate the advantage of a question-answering model and a textual entailment model, propose a novel method to generate counterfactual information with $70\%$ correctness, and show its usability under such performance.
+*  We propose three different counterfactual explanation forms and conduct human evaluations to compare their acceptability on the FEVER dataset. 
+*  We show experimental results which strongly support that automatically-generated counterfactual explanations of fake news are more acceptable than summarization-based explanations.
+*  We show that counterfactual explanations are robust to system errors.
+    
+    
 ## **General Framework**
 
 ![](https://i.imgur.com/wslKi1G.png)
