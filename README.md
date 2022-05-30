@@ -1,4 +1,4 @@
-# AsktoKnowMore
+# Ask to Know More: Counterfactual Explanations for Fake Claims
 This repository contains code and models for the paper on 2022 SIGKDD: "Ask to Know More: Counterfactual Explanations for Fake Claims"
 
 * We integrate the advantage of a question-answering model and a textual entailment model, propose a novel method to generate counterfactual information with $70\%$ correctness, and show its usability under such performance.
