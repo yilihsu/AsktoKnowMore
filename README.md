@@ -17,14 +17,14 @@ Download the pretrained QA2D model from the Google Cloud here. You could downloa
 
 ### **Requirements for QA-to-Claim Model**
 
-Python==3.7.3
-torch==1.7.1
-tqdm==4.49.0
-transformers==4.3.3
-stanza==1.1.1
-nltk==3.5
-scikit-learn==0.23.2
-sense2vec
+* Python==3.7.3
+* torch==1.7.1
+* tqdm==4.49.0
+* transformers==4.3.3
+* stanza==1.1.1
+* nltk==3.5
+* scikit-learn==0.23.2
+* sense2vec
 
 ### Inputs and outputs (main.py)
 
