@@ -15,8 +15,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # read fever dataset from csv, including claim and evidence columns
 claim_evidence_df = pd.read_csv('./claim_evidence_pairs.csv', encoding='utf8')
-# path to the self-defined Questgen by this paper
-os.chdir('./Questgen/')
 
 # load MCQ/ FAQ questions generator model
 qg = main.QGen()
@@ -30,7 +28,7 @@ out_dir = "questions/"
 os.makedirs("questions/", exist_ok=True)
 claim_question = {}
 count=0
-for claim in tqdm(claim_evidence_df['claim'][count:]):
+for claim in tqdm(claim_evidence_df['claim'][count:500]):
     payload = copy.deepcopy(qpayload)
     payload['input_text'] = claim
 
@@ -38,15 +36,11 @@ for claim in tqdm(claim_evidence_df['claim'][count:]):
     output = qg.predict_mcq(payload)
     if len(output) != 0:
         for q in output['questions']:
-            print("==MCQ questions==")
-            print(q['question_statement'])
             questions.add(q['question_statement'])
     # generate FAQ questions
     output = qg.predict_shortq(payload)
     if len(output) != 0:
         for q in output['questions']:
-            print("==FAQ questions==")
-            print(q['Question'])
             questions.add(q['Question'])
     try:
         claim_question[str(count)+"_"+claim] = list(dict.fromkeys(questions))
@@ -65,11 +59,13 @@ with open(out_dir+"question_"+str(div+1)+".json", "w") as outfile:
 
 
 Questions_df = pd.read_json("questions/question_1.json", orient ='index', encoding='utf8')
-for i in range(2,31):
+for i in range(2,6):
     df1 = pd.read_json("questions/question_"+str(i)+".json", orient ='index', encoding='utf8')
     Questions_df = pd.concat([Questions_df, df1])
 Questions_df = Questions_df.reset_index()
-Questions_df.columns = ['claim', 'q1','q2','q3','q4','q5','q6','q7','q8','q9','q10']#'q11','q12','q13','q14','q15','q16','q17']
+question_num = len(Questions_df.columns)-1
+question_col = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17']
+Questions_df.columns = ['claim'] + question_col[:question_num]
 Questions_df["claim"] = Questions_df["claim"].str.replace("“","").replace("”","").replace(r"\d+_","", regex=True)
 
 
@@ -95,7 +91,7 @@ payload = {
 output_dic = {}
 Answer_dic = {}
 count = 0
-for i, evidence in tqdm(enumerate(claim_evidence_df["evidences"][count:])):
+for i, evidence in tqdm(enumerate(claim_evidence_df["evidence"][count:500])):
     # truncate the text into the length of 512
     payload["input_text"] = evidence[:512]
     Answer_row = []
@@ -111,7 +107,7 @@ for i, evidence in tqdm(enumerate(claim_evidence_df["evidences"][count:])):
         
         Answer_row.append(copy_QA)
         copy_Answer_dic = copy.deepcopy(Answer_dic)
-        copy_Answer_dic["evidences"] = evidence
+        copy_Answer_dic["evidence"] = evidence
         copy_Answer_dic["claim"] = qc_df.iloc[count+i]["claim"]
         copy_Answer_dic["QA"] = Answer_row
         
@@ -127,7 +123,7 @@ with open(out_dir+"output_dic_"+str(div+1)+".json", "w") as outfile:
     output_dic = {}
 
 df = pd.read_json("QAs/output_dic_1.json", orient ='index')
-for i in range(2,31):
+for i in range(2,6):
     df1 = pd.read_json("QAs/output_dic_"+str(i)+".json", orient ='index')
     df = pd.concat([df, df1])
 
@@ -170,86 +166,26 @@ answers = []
 answers_df.to_csv("best_answers/output_"+str(div+1)+".csv")
 
 df = pd.read_json("QAs/output_dic_1.json", orient ='index')
-for i in range(2,31):
+for i in range(2,6):
     df1 = pd.read_json("QAs/output_dic_"+str(i)+".json", orient ='index')
     df = pd.concat([df, df1])
 
 df2 = pd.read_csv("best_answers/output_1.csv", names=['best answer'], header=0)
-for i in range(2,31):
+for i in range(2,6):
     df1 = pd.read_csv("best_answers/output_"+str(i)+".csv", names=['best answer'], header=0)
     df2 = pd.concat([df2, df1], ignore_index=True)
 
 df = df.join(df2)
 QA_df = df
 
-a1 = []
-a2 = []
-a3 = []
-a4 = []
-a5 = []
-a6 = []
-a7 = []
-a8 = []
-a9 = []
-a10 = []
-
-q1 = []
-q2 = []
-q3 = []
-q4 = []
-q5 = []
-q6 = []
-q7 = []
-q8 = []
-q9 = []
-q10 = []
-
-for qa in QA_df["QA"]:
-    a1.append(qa[0]["answer"])
-    a2.append(qa[1]["answer"])
-    a3.append(qa[2]["answer"])
-    a4.append(qa[3]["answer"])
-    a5.append(qa[4]["answer"])
-    a6.append(qa[5]["answer"])
-    a7.append(qa[6]["answer"])
-    a8.append(qa[7]["answer"])
-    a9.append(qa[8]["answer"])
-    a10.append(qa[9]["answer"])
-    
-    q1.append(qa[0]["question"])
-    q2.append(qa[1]["question"])
-    q3.append(qa[2]["question"])
-    q4.append(qa[3]["question"])
-    q5.append(qa[4]["question"])
-    q6.append(qa[5]["question"])
-    q7.append(qa[6]["question"])
-    q8.append(qa[7]["question"])
-    q9.append(qa[8]["question"])
-    q10.append(qa[9]["question"])
-
-QA_df["Q1"] = q1
-QA_df["Q2"] = q2
-QA_df["Q3"] = q3
-QA_df["Q4"] = q4
-QA_df["Q5"] = q5
-QA_df["Q6"] = q6
-QA_df["Q7"] = q7
-QA_df["Q8"] = q8
-QA_df["Q9"] = q9
-QA_df["Q10"] = q10
-
-QA_df["A1"] = a1
-QA_df["A2"] = a2
-QA_df["A3"] = a3
-QA_df["A4"] = a4
-QA_df["A5"] = a5
-QA_df["A6"] = a6
-QA_df["A7"] = a7
-QA_df["A8"] = a8
-QA_df["A9"] = a9
-QA_df["A10"] = a10
-
-
+for i in question_num:
+    questions = []
+    answers = []
+    for qa in QA_df["QA"]:
+        answers.append(qa[i]["answer"])
+        questions.append(qa[i]["question"])
+    QA_df["Q"+str(i+1)] = questions
+    QA_df["A"+str(i+1)] = answers
 
 
 model_args = Seq2SeqArgs()
@@ -257,7 +193,7 @@ model_args.max_length = 1000
 
 QA2D_model = Seq2SeqModel(
             encoder_decoder_type="bart", 
-            encoder_decoder_name="./QA2D",
+            encoder_decoder_name="./QA2D_model",
             cuda_device=0,
             args=model_args)
 
@@ -265,18 +201,9 @@ QA2D_model = Seq2SeqModel(
 r = re.compile(r'[.]$')
 df = df.replace(np.nan, '', regex=True)
 
-d = {
-    "A1": "Q1",
-    "A2": "Q2",
-    "A3": "Q3",
-    "A4": "Q4",
-    "A5": "Q5",
-    "A6": "Q6",
-    "A7": "Q7",
-    "A8": "Q8",
-    "A9": "Q9",
-    "A10": "Q10"
-}
+d = {}
+for i in question_num:
+    d["Q"+str(i+1)] = "A"+str(i+1)
 
 counta =0
 output = []
