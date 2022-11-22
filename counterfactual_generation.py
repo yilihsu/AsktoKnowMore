@@ -88,6 +88,7 @@ for i, r in enumerate(df["claim"]):
                 change =1
                 break
     if change ==0:
+        output.append(r)
         print(r)
 df["output"] = output
 
@@ -115,7 +116,7 @@ def replace(old, new, str, caseinsentive = False):
 counter_factuals_1=[]
 counter_factuals_2=[]
 counter_factuals_3=[]
-df = pd.read_csv("./counterfactuals.csv")
+
 for id, row in df.iterrows():
     explanation = row['0']
     neg_claim = row['output']
