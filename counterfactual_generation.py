@@ -4,12 +4,12 @@
 import pandas as pd
 import nltk
 import spacy
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
 import re
+from rouge import Rouge 
 
-
+rouge = Rouge()
 df = pd.read_csv('./explanation_all.csv') 
 
 change_dic = {" has ": " HAS NOT ",
@@ -89,7 +89,6 @@ for i, r in enumerate(df["claim"]):
                 break
     if change ==0:
         output.append(r)
-        print(r)
 df["output"] = output
 
 #generate counterfactual form
@@ -118,7 +117,7 @@ counter_factuals_2=[]
 counter_factuals_3=[]
 
 for id, row in df.iterrows():
-    explanation = row['0']
+    explanation = row['explanation']
     neg_claim = row['output']
     claim = row['claim'].replace("”","").replace("“","").replace('"',"").replace('.',"").replace('(',"").replace(')',"")
     
@@ -190,7 +189,6 @@ for id, row in df.iterrows():
                     if key in sub_explanation:
                         sub_explanation = sub_explanation.replace(key,"").strip()
                         break
-                #print("===2")
 
     if removed == False:
         sub_explanation = explanation

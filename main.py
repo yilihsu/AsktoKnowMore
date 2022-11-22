@@ -56,8 +56,7 @@ for claim in tqdm(claim_evidence_df['claim'][count:500]):
 with open(out_dir+"question_"+str(div+1)+".json", "w") as outfile: 
     json.dump(claim_question, outfile)
     claim_question = {}
-
-
+    
 Questions_df = pd.read_json("questions/question_1.json", orient ='index', encoding='utf8')
 for i in range(2,6):
     df1 = pd.read_json("questions/question_"+str(i)+".json", orient ='index', encoding='utf8')
@@ -146,17 +145,12 @@ for i, claim in tqdm(enumerate(df["claim"][:])):
     if len(in_strings) !=0:
         inputs = tokenizer(in_strings, padding=True,return_tensors="pt")
         outputs = model(**inputs)
-        print(in_strings)
-        print(outputs)
-        #pred = outputs.logits.max(1).indices
         outputs_np = outputs[0].detach().numpy()
         max_contra_id = np.argmax(outputs_np.T[0], axis=0)
-        #    answers.append(df.iloc[i]["QA"][max_contra_id]["answer"])
         answers.append(ans_strings[max_contra_id])
     else:
         answers.append(" ")
     div, mod = divmod(i+1,100)
-#    answers.append(df.iloc[i]["QA"][max_contra_id]["answer"])
     if mod == 0:
         answers_df = pd.DataFrame(answers)
         answers = []
@@ -178,7 +172,7 @@ for i in range(2,6):
 df = df.join(df2)
 QA_df = df
 
-for i in question_num:
+for i in range(question_num):
     questions = []
     answers = []
     for qa in QA_df["QA"]:
@@ -202,8 +196,8 @@ r = re.compile(r'[.]$')
 df = df.replace(np.nan, '', regex=True)
 
 d = {}
-for i in question_num:
-    d["Q"+str(i+1)] = "A"+str(i+1)
+for i in range(question_num):
+    d["A"+str(i+1)] = "Q"+str(i+1)
 
 counta =0
 output = []
@@ -214,14 +208,12 @@ for index, row in df.iterrows():
     counta =0
     for answer_col in d:
         if row["best answer"] == row[answer_col]:
-            #if row[d[answer_col]] == "":
             doc = nlp(row["best answer"])
             sent = False
             for token in doc:
                 if token.dep_ == "nsubj":
                     sent = True
                     break
-
             if r.search(row["best answer"]) != None and sent == True:
                 results.append(row["best answer"].replace("Yes, ", "").capitalize())
             else:
@@ -229,5 +221,6 @@ for index, row in df.iterrows():
             break
 
 results_df = pd.DataFrame(results)
+results_df.columns = ['explanation']
 QA_df.join(results_df).to_csv("explanation_all.csv")
 
