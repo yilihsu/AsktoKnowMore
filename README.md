@@ -46,7 +46,7 @@ gsutil -m cp -r \
 * nltk==3.5
 * spacy
 * scikit-learn==0.23.2
-* simpletransformers
+* simpletransformers==0.63
 * transformers==4.24.0
 * rouge
 
