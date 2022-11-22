@@ -48,6 +48,7 @@ gsutil -m cp -r \
 * scikit-learn==0.23.2
 * simpletransformers
 * transformers==4.24.0
+* rouge
 
 ```
 ### Inputs and outputs (main.py)
